@@ -1,11 +1,13 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
-  bigint,
-  index,
-  mysqlTableCreator,
+  boolean,
+  double,
+  int,
+  mysqlTable,
+  text,
   timestamp,
   varchar,
 } from "drizzle-orm/mysql-core";
@@ -16,19 +18,58 @@ import {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const mysqlTable = mysqlTableCreator((name) => `amex-financial-app_${name}`);
 
-export const posts = mysqlTable(
-  "post",
-  {
-    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-    name: varchar("name", { length: 256 }),
-    createdAt: timestamp("created_at")
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt").onUpdateNow(),
-  },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
-  })
-);
+export const customers = mysqlTable("customers", {
+  id: int("id").primaryKey().autoincrement(),
+  name: varchar("name", { length: 256 }).notNull(),
+  email: varchar("email", { length: 256 }).unique().notNull(),
+  phone: varchar("email", { length: 256 }),
+  address: varchar("address", { length: 256 }),
+  specialInstructions: text("special_instructions"),
+  createdAt: timestamp("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updatedAt").onUpdateNow(),
+});
+
+export const userRelations = relations(customers, ({ many }) => ({
+  creditCards: many(creditCards),
+}));
+
+export const creditCards = mysqlTable("credit_cards", {
+  id: int("id").primaryKey().autoincrement(),
+  customerId: int("customer_id"),
+  cardNumber: varchar("card_number", { length: 256 }).unique().notNull(),
+  expirationDate: timestamp("expiration_date"),
+  cvv: varchar("cvv", { length: 256 }),
+  createdAt: timestamp("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updatedAt").onUpdateNow(),
+});
+
+export const creditCardRelations = relations(creditCards, ({ one, many }) => ({
+  customer: one(customers, {
+    fields: [creditCards.customerId],
+    references: [customers.id],
+  }),
+  transactions: many(transactions),
+}));
+
+export const transactions = mysqlTable("transactions", {
+  id: int("id").primaryKey().autoincrement(),
+  creditCardId: int("credit_card_id"),
+  amount: double("amount").notNull(),
+  completed: boolean("completed").default(false),
+  createdAt: timestamp("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updatedAt").onUpdateNow(),
+});
+
+export const transactionRelations = relations(transactions, ({ one }) => ({
+  creditCard: one(creditCards, {
+    fields: [transactions.creditCardId],
+    references: [creditCards.id],
+  }),
+}));
