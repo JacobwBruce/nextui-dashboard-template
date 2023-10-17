@@ -1,17 +1,20 @@
 import { type AppType } from "next/app";
 import { NextUIProvider } from "@nextui-org/react";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
+import Clerk from "~/components/providers/Clerk";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <NextUIProvider>
-      <ClerkProvider {...pageProps}>
-        <Component {...pageProps} />
-      </ClerkProvider>
+      <NextThemesProvider attribute="class" defaultTheme="system">
+        <Clerk>
+          <Component {...pageProps} />
+        </Clerk>
+      </NextThemesProvider>
     </NextUIProvider>
   );
 };
