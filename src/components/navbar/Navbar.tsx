@@ -1,39 +1,77 @@
-import { UserButton } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import {
-  Link,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  DropdownTrigger,
   NavbarBrand,
   Navbar as NavbarContainer,
   NavbarContent,
   NavbarItem,
+  User,
+  DropdownSection,
 } from "@nextui-org/react";
-import NextLink from "next/link";
+import { type Key } from "react";
+import { toast } from "sonner";
 
 export default function Navbar() {
+  const { user } = useUser();
+  const { signOut } = useClerk();
+
+  const handleAction = (key: Key) => {
+    switch (key) {
+      case "profile":
+        console.log("profile");
+        break;
+      case "settings":
+        console.log("settings");
+        break;
+      case "logout":
+        toast.promise(signOut, {
+          loading: "Signing out...",
+          success: "Signed out successfully",
+          error: "Failed to sign out",
+        });
+        break;
+      default:
+        throw new Error("Invalid action");
+        break;
+    }
+  };
+
   return (
-    <NavbarContainer>
+    <NavbarContainer className="border-b-2 border-solid border-gray-100">
       <NavbarBrand>
         <p className="font-bold text-inherit">AmEx</p>
       </NavbarBrand>
-      <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-        <NavbarItem>
-          <Link as={NextLink} color="foreground" href="#">
-            Features
-          </Link>
-        </NavbarItem>
-        <NavbarItem isActive>
-          <Link as={NextLink} href="#" aria-current="page">
-            Customers
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link as={NextLink} color="foreground" href="#">
-            Integrations
-          </Link>
-        </NavbarItem>
-      </NavbarContent>
+
       <NavbarContent justify="end">
         <NavbarItem>
-          <UserButton />
+          <Dropdown>
+            <DropdownTrigger>
+              <User
+                className="cursor-pointer"
+                name={user?.fullName}
+                description={user?.primaryEmailAddress?.emailAddress}
+                avatarProps={{
+                  src: user?.imageUrl,
+                }}
+              />
+            </DropdownTrigger>
+            <DropdownMenu
+              variant="shadow"
+              color="primary"
+              onAction={handleAction}
+            >
+              <DropdownSection showDivider>
+                <DropdownItem key="profile">Profile</DropdownItem>
+                <DropdownItem key="settings">Settings</DropdownItem>
+              </DropdownSection>
+              <DropdownSection>
+                <DropdownItem key="logout">Logout</DropdownItem>
+              </DropdownSection>
+            </DropdownMenu>
+          </Dropdown>
         </NavbarItem>
       </NavbarContent>
     </NavbarContainer>

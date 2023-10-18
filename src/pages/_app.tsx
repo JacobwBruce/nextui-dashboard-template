@@ -1,5 +1,6 @@
 import { type AppType } from "next/app";
 import { NextUIProvider } from "@nextui-org/react";
+import { Toaster } from "sonner";
 
 import { api } from "~/utils/api";
 
@@ -11,6 +12,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <NextUIProvider>
       <Clerk {...pageProps}>
         <Component {...pageProps} />
+        <Toaster richColors />
       </Clerk>
     </NextUIProvider>
   );
