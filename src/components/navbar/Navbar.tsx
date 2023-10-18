@@ -1,30 +1,32 @@
 import { useClerk, useUser } from "@clerk/nextjs";
 import {
   Dropdown,
-  DropdownMenu,
   DropdownItem,
+  DropdownMenu,
+  DropdownSection,
   DropdownTrigger,
-  NavbarBrand,
   Navbar as NavbarContainer,
+  NavbarBrand as NextNavbarBrand,
   NavbarContent,
   NavbarItem,
+  NavbarMenu,
+  NavbarMenuToggle,
   User,
-  DropdownSection,
 } from "@nextui-org/react";
 import { type Key } from "react";
 import { toast } from "sonner";
+import { NavItems } from "../contants/ui/NavItems";
+import SidebarContent from "../sidebar/SidebarContent";
+import NavbarBrand from "./NavbarBrand";
 
 export default function Navbar() {
   const { user } = useUser();
-  const { signOut } = useClerk();
+  const { signOut, openUserProfile } = useClerk();
 
   const handleAction = (key: Key) => {
     switch (key) {
       case "profile":
-        console.log("profile");
-        break;
-      case "settings":
-        console.log("settings");
+        openUserProfile();
         break;
       case "logout":
         toast.promise(signOut, {
@@ -40,11 +42,13 @@ export default function Navbar() {
   };
 
   return (
-    <NavbarContainer className="border-b-2 border-solid border-gray-100">
-      <NavbarBrand>
-        <p className="font-bold text-inherit">AmEx</p>
-      </NavbarBrand>
-
+    <NavbarContainer isBordered maxWidth="2xl">
+      <NavbarContent className="md:hidden" justify="start">
+        <NavbarMenuToggle />
+        <NextNavbarBrand>
+          <NavbarBrand />
+        </NextNavbarBrand>
+      </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
           <Dropdown>
@@ -65,7 +69,6 @@ export default function Navbar() {
             >
               <DropdownSection showDivider>
                 <DropdownItem key="profile">Profile</DropdownItem>
-                <DropdownItem key="settings">Settings</DropdownItem>
               </DropdownSection>
               <DropdownSection>
                 <DropdownItem key="logout">Logout</DropdownItem>
@@ -74,6 +77,9 @@ export default function Navbar() {
           </Dropdown>
         </NavbarItem>
       </NavbarContent>
+      <NavbarMenu>
+        <SidebarContent />
+      </NavbarMenu>
     </NavbarContainer>
   );
 }
