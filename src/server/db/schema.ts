@@ -22,8 +22,9 @@ import {
 export const customers = mysqlTable("customers", {
   id: int("id").primaryKey().autoincrement(),
   name: varchar("name", { length: 256 }).notNull(),
+  customerNumber: varchar("customer_number", { length: 256 }).unique(),
   email: varchar("email", { length: 256 }).unique().notNull(),
-  phone: varchar("email", { length: 256 }),
+  phone: varchar("phone_number", { length: 256 }),
   address: varchar("address", { length: 256 }),
   specialInstructions: text("special_instructions"),
   createdAt: timestamp("created_at")
@@ -60,6 +61,10 @@ export const transactions = mysqlTable("transactions", {
   id: int("id").primaryKey().autoincrement(),
   creditCardId: int("credit_card_id"),
   amount: double("amount").notNull(),
+  completionDate: timestamp("completion_date"),
+  requestDate: timestamp("request_date").notNull(),
+  iataCode: varchar("iata_code", { length: 256 }),
+  recurring: boolean("recurring").default(false),
   completed: boolean("completed").default(false),
   createdAt: timestamp("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
