@@ -42,7 +42,7 @@ export default function ProtectedRoute({
         <div className="hidden md:block">
           <Sidebar />
         </div>
-        <div className="flex w-full flex-col">
+        <div className="h-screen w-full overflow-scroll">
           <Navbar />
           <div className="p-4">{children}</div>
         </div>

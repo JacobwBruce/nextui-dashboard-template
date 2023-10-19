@@ -1,4 +1,4 @@
-import { ErrorMapCtx, ZodIssueOptionalMessage } from "zod";
+import { type ErrorMapCtx, type ZodIssueOptionalMessage } from "zod";
 
 export const phoneErrorMessages = {
   errorMap: (

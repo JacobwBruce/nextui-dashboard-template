@@ -1,30 +1,32 @@
-import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Button,
-  useDisclosure,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Textarea,
+  Tooltip,
+  useDisclosure,
 } from "@nextui-org/react";
+import { TRPCClientError } from "@trpc/client";
 import { useForm } from "react-hook-form";
 import {
-  InsertCustomerValues,
+  type Customer,
   insertCustomerSchema,
 } from "~/schema/customers/CustomerSchemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { TRPCClientError } from "@trpc/client";
 
 import { FaSave } from "react-icons/fa";
+import { FaUserPlus } from "react-icons/fa6";
 import { toast } from "sonner";
 import { api } from "~/utils/api";
 
 export default function CreateCustomerModal() {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
+  const trpcUtils = api.useContext();
   const insertCustomer = api.customer.create.useMutation();
 
   const {
@@ -32,16 +34,18 @@ export default function CreateCustomerModal() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<InsertCustomerValues>({
+  } = useForm<Customer>({
     resolver: zodResolver(insertCustomerSchema),
   });
 
-  const saveCustomer = async (data: InsertCustomerValues) => {
+  const saveCustomer = async (data: Customer) => {
     try {
-      const customer = await insertCustomer.mutateAsync(data);
-      console.log(customer);
+      await insertCustomer.mutateAsync(data);
+      reset();
+      onClose();
+      await trpcUtils.customer.getAll.invalidate();
       toast.success("Customer created successfully!");
-    } catch (err: any | TRPCClientError<any>) {
+    } catch (err) {
       if (err instanceof TRPCClientError) {
         toast.error(err.message);
       } else {
@@ -52,9 +56,11 @@ export default function CreateCustomerModal() {
 
   return (
     <>
-      <Button onPress={onOpen} color="primary">
-        Create Customer
-      </Button>
+      <Tooltip showArrow content="Create Customer">
+        <Button onPress={onOpen} variant="shadow" color="primary" isIconOnly>
+          <FaUserPlus />
+        </Button>
+      </Tooltip>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -111,6 +117,11 @@ export default function CreateCustomerModal() {
                     size="sm"
                     variant="bordered"
                     label="Phone number"
+                    startContent={
+                      <div className="pointer-events-none flex items-center">
+                        <span className="text-small text-default-400">+1</span>
+                      </div>
+                    }
                     autoComplete="off"
                     isInvalid={!!errors.phone}
                     errorMessage={errors.phone?.message}

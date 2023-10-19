@@ -1,7 +1,12 @@
-import { insertCustomerSchema } from "~/schema/customers/CustomerSchemas";
+import {
+  customerSchema,
+  insertCustomerSchema,
+} from "~/schema/customers/CustomerSchemas";
 import { customers } from "~/server/db/schema";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { asc, desc, like, sql } from "drizzle-orm";
 
 export const customerRouter = createTRPCRouter({
   create: publicProcedure
@@ -17,5 +22,51 @@ export const customerRouter = createTRPCRouter({
           message: "Failed to create customer",
         });
       }
+    }),
+  getAll: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+        sortBy: z.object({
+          column: customerSchema.keyof(),
+          direction: z.enum(["ascending", "descending"]),
+        }),
+        search: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { column, direction } = input.sortBy;
+      const orderBy =
+        direction === "ascending"
+          ? asc(customers[column])
+          : desc(customers[column]);
+      const fullTextSearch = like(customers.name, `%${input.search}%`);
+
+      const countResult = await ctx.db
+        // for some reason tsserver doesn't think select can take any arguments
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        .select({ count: sql<number>`count(*)` })
+        .from(customers)
+        .where(fullTextSearch);
+
+      // adding ts-ignore becuase of the above reason
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const count: number = countResult[0].count;
+
+      const result = await ctx.db
+        .select()
+        .from(customers)
+        .where(fullTextSearch)
+        .orderBy(orderBy)
+        .limit(input.limit ?? 100)
+        .offset(input.offset ?? 0);
+      return {
+        count,
+        customers: result,
+      };
     }),
 });

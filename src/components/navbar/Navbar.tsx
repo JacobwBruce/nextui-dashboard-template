@@ -15,7 +15,6 @@ import {
 } from "@nextui-org/react";
 import { type Key } from "react";
 import { toast } from "sonner";
-import { NavItems } from "../contants/ui/NavItems";
 import SidebarContent from "../sidebar/SidebarContent";
 import NavbarBrand from "./NavbarBrand";
 
