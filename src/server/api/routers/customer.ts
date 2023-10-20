@@ -6,7 +6,7 @@ import { customers } from "~/server/db/schema";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { asc, desc, like, sql } from "drizzle-orm";
+import { asc, desc, eq, like, sql } from "drizzle-orm";
 
 export const customerRouter = createTRPCRouter({
   create: publicProcedure
@@ -68,5 +68,23 @@ export const customerRouter = createTRPCRouter({
         count,
         customers: result,
       };
+    }),
+  deleteMany: publicProcedure
+    .input(z.set(z.number()))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        console.log(input);
+        for (const id of input) {
+          console.log(id);
+          await ctx.db.delete(customers).where(eq(customers.id, id));
+        }
+        return { status: "ok" };
+      } catch (error) {
+        console.error(error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete customers",
+        });
+      }
     }),
 });

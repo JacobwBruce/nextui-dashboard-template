@@ -1,8 +1,8 @@
+import { Input } from "@nextui-org/react";
 import { useState } from "react";
-import { Button, Input } from "@nextui-org/react";
-import { FaUserMinus } from "react-icons/fa6";
 import { LuSearch } from "react-icons/lu";
 import CreateCustomerModal from "~/components/modals/customers/create/CreateCustomerModal";
+import DeleteCustomerModal from "~/components/modals/customers/delete/DeleteCustomersModal";
 
 interface CustomertableUtilsProps {
   selectedItems: Set<string>;
@@ -38,9 +38,7 @@ export default function CustomerTableUtils({
         }}
       />
       {selectedItems.size > 0 ? (
-        <Button variant="shadow" color="danger" isIconOnly>
-          <FaUserMinus />
-        </Button>
+        <DeleteCustomerModal customerIds={selectedItems} />
       ) : (
         <CreateCustomerModal />
       )}
