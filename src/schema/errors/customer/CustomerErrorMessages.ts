@@ -42,9 +42,9 @@ export const addressErrorMessages = {
   ): { message: string } => {
     switch (issue.code) {
       case "too_small":
-        return { message: "Address must be at least 2 characters" };
+        return { message: "Address is required" };
       case "too_big":
-        return { message: "Address must be at most 50 characters" };
+        return { message: "Address must be at most 255 characters" };
       case "invalid_type":
         return { message: "Address must be a string" };
       default:

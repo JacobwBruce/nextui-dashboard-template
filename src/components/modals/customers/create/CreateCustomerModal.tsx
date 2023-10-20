@@ -22,9 +22,12 @@ import { FaSave } from "react-icons/fa";
 import { FaUserPlus } from "react-icons/fa6";
 import { toast } from "sonner";
 import { api } from "~/utils/api";
+import AutocompleteField from "~/components/inputs/autocomplete/AutoComplete";
+import { useState } from "react";
 
 export default function CreateCustomerModal() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [addressLoading, setAddressLoading] = useState(false);
 
   const trpcUtils = api.useContext();
   const insertCustomer = api.customer.create.useMutation();
@@ -33,10 +36,18 @@ export default function CreateCustomerModal() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<Customer>({
     resolver: zodResolver(insertCustomerSchema),
+    defaultValues: {
+      address: "",
+    },
   });
+
+  const address = watch("address");
 
   const saveCustomer = async (data: Customer) => {
     try {
@@ -54,6 +65,7 @@ export default function CreateCustomerModal() {
     }
   };
 
+  const [locations, setLocations] = useState<string[]>([]);
   return (
     <>
       <Tooltip showArrow content="Create Customer">
@@ -127,16 +139,37 @@ export default function CreateCustomerModal() {
                     errorMessage={errors.phone?.message}
                     {...register("phone")}
                   />
-                  <Input
-                    radius="lg"
-                    type="text"
-                    size="sm"
-                    variant="bordered"
-                    label="Address"
-                    autoComplete="off"
-                    isInvalid={!!errors.address}
-                    errorMessage={errors.address?.message}
-                    {...register("address")}
+
+                  <AutocompleteField
+                    selectedValue={address}
+                    isLoading={addressLoading}
+                    inputProps={{
+                      radius: "lg",
+                      size: "sm",
+                      variant: "bordered",
+                      label: "Location",
+                      autoComplete: "off",
+                      isInvalid: !!errors.address,
+                      errorMessage: errors.address?.message,
+                    }}
+                    onChange={async (value) => {
+                      if (value.length === 0) {
+                        setLocations([]);
+                        return;
+                      }
+                      setAddressLoading(true);
+                      const response =
+                        await trpcUtils.location.search.fetch(value);
+                      setAddressLoading(false);
+                      setLocations(response);
+                    }}
+                    suggestions={locations}
+                    renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+                    onSuggestionSelected={(suggestion) => {
+                      setValue("address", suggestion);
+                      //need to reset errors
+                      clearErrors("address");
+                    }}
                   />
                   <Textarea
                     className="col-span-2"

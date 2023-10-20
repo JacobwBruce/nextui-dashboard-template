@@ -13,7 +13,7 @@ export const insertCustomerSchema = createInsertSchema(customers, {
   phone: z.string(phoneErrorMessages).min(10).max(10).regex(/^\d+$/),
   name: z.string(nameErrorMessages).min(1).max(256),
   customerNumber: z.string(customerNumberErrorMessages).min(1).max(256),
-  address: z.string(addressErrorMessages).min(1).max(256),
+  address: z.string(addressErrorMessages).min(2).max(256),
 });
 
 export type InsertCustomerValues = z.infer<typeof insertCustomerSchema>;
