@@ -16,6 +16,7 @@ import {
 } from "~/schema/customers/CustomerSchemas";
 import { api } from "~/utils/api";
 import CustomerTableUtils from "./CustomerTableUtils";
+import { useRouter } from "next/router";
 
 interface CustomerColumn {
   key: keyof InsertCustomerValues;
@@ -57,6 +58,7 @@ interface Sort {
 }
 
 export default function CustomersTable() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<Sort>({
     column: "id",
@@ -106,6 +108,7 @@ export default function CustomersTable() {
         onSortChange={(key) => {
           setSortBy(key as Sort);
         }}
+        onRowAction={(key) => router.push(`/customers/${key}`)}
         bottomContent={
           !isLoading &&
           data && (

@@ -5,7 +5,7 @@ import {
   customerSchema,
   insertCustomerSchema,
 } from "~/schema/customers/CustomerSchemas";
-import { customers } from "~/server/db/schema";
+import { creditCards, customers } from "~/server/db/schema";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const customerRouter = createTRPCRouter({
@@ -74,7 +74,6 @@ export const customerRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       try {
         for (const id of input) {
-          console.log(id);
           await ctx.db.delete(customers).where(eq(customers.id, id));
         }
         return { status: "ok" };
@@ -86,4 +85,26 @@ export const customerRouter = createTRPCRouter({
         });
       }
     }),
+  getById: publicProcedure.input(z.number()).query(async ({ ctx, input }) => {
+    const [customer] = await ctx.db
+      .select()
+      .from(customers)
+      .where(eq(customers.id, input));
+
+    // get all customer credit creditCards
+
+    if (!customer) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Customer not found",
+      });
+    }
+
+    const creditCardsResult = await ctx.db
+      .select()
+      .from(creditCards)
+      .where(eq(creditCards.customerId, input));
+
+    return { ...customer, creditCards: creditCardsResult };
+  }),
 });
