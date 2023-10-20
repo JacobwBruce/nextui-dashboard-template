@@ -22,7 +22,7 @@ export default function CustomerTableUtils({
   return (
     <div className="w-100 flex items-center justify-between">
       <Input
-        className="w-96"
+        className="w-96 "
         variant="bordered"
         color="primary"
         isClearable
