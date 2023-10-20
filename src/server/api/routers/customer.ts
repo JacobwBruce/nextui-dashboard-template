@@ -1,12 +1,12 @@
+import { TRPCError } from "@trpc/server";
+import { asc, desc, eq, like, sql } from "drizzle-orm";
+import { z } from "zod";
 import {
   customerSchema,
   insertCustomerSchema,
 } from "~/schema/customers/CustomerSchemas";
 import { customers } from "~/server/db/schema";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import { asc, desc, eq, like, sql } from "drizzle-orm";
 
 export const customerRouter = createTRPCRouter({
   create: publicProcedure
