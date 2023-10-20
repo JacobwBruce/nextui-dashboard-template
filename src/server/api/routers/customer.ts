@@ -73,7 +73,6 @@ export const customerRouter = createTRPCRouter({
     .input(z.set(z.number()))
     .mutation(async ({ ctx, input }) => {
       try {
-        console.log(input);
         for (const id of input) {
           console.log(id);
           await ctx.db.delete(customers).where(eq(customers.id, id));

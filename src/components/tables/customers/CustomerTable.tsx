@@ -89,6 +89,7 @@ export default function CustomersTable() {
     <div className="flex flex-col gap-4">
       <CustomerTableUtils
         selectedItems={selectedKeys}
+        setSelectedItems={setSelectedKeys}
         search={search}
         setSearch={setSearch}
       />

@@ -6,12 +6,14 @@ import DeleteCustomerModal from "~/components/modals/customers/delete/DeleteCust
 
 interface CustomertableUtilsProps {
   selectedItems: Set<string>;
+  setSelectedItems: React.Dispatch<React.SetStateAction<Set<string>>>;
   search: string;
   setSearch: (value: string) => void;
 }
 
 export default function CustomerTableUtils({
   selectedItems,
+  setSelectedItems,
   search,
   setSearch,
 }: CustomertableUtilsProps) {
@@ -38,7 +40,10 @@ export default function CustomerTableUtils({
         }}
       />
       {selectedItems.size > 0 ? (
-        <DeleteCustomerModal customerIds={selectedItems} />
+        <DeleteCustomerModal
+          customerIds={selectedItems}
+          setCustomerIds={setSelectedItems}
+        />
       ) : (
         <CreateCustomerModal />
       )}

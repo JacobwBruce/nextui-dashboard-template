@@ -16,10 +16,12 @@ import { api } from "~/utils/api";
 
 interface DeleteCustomersModalProps {
   customerIds: Set<string>;
+  setCustomerIds: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 export default function DeleteCustomerModal({
   customerIds,
+  setCustomerIds,
 }: DeleteCustomersModalProps) {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -33,6 +35,7 @@ export default function DeleteCustomerModal({
         customerIdsNumber.add(Number(key));
       }
       await deleteCustomers.mutateAsync(customerIdsNumber);
+      setCustomerIds(new Set<string>());
       await trpcUtils.customer.getAll.invalidate();
       toast.success("Customers deleted");
       onClose();
