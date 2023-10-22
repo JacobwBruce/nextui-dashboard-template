@@ -187,7 +187,7 @@ export default function CreateCustomerModal() {
               <ModalFooter>
                 <Button
                   type="button"
-                  variant="flat"
+                  variant="ghost"
                   isDisabled={isSubmitting}
                   onPress={() => {
                     reset();
@@ -200,6 +200,7 @@ export default function CreateCustomerModal() {
                   className="text-white"
                   type="submit"
                   color="success"
+                  variant="shadow"
                   isLoading={isSubmitting}
                   startContent={!isSubmitting && <FaSave />}
                 >
