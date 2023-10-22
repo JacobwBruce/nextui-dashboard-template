@@ -28,11 +28,14 @@ export default function Navbar() {
         openUserProfile();
         break;
       case "logout":
-        toast.promise(signOut, {
-          loading: "Signing out...",
-          success: "Signed out successfully",
-          error: "Failed to sign out",
-        });
+        toast.promise(
+          signOut().then(() => localStorage.clear()),
+          {
+            loading: "Signing out...",
+            success: "Signed out successfully",
+            error: "Failed to sign out",
+          },
+        );
         break;
       default:
         throw new Error("Invalid action");

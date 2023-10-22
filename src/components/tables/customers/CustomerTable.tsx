@@ -9,48 +9,13 @@ import {
   TableRow,
   getKeyValue,
 } from "@nextui-org/react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import {
-  type Customer,
-  type InsertCustomerValues,
-} from "~/schema/customers/CustomerSchemas";
+import { type Customer } from "~/schema/customers/CustomerSchemas";
 import { api } from "~/utils/api";
 import CustomerTableUtils from "./CustomerTableUtils";
-import { useRouter } from "next/router";
-
-interface CustomerColumn {
-  key: keyof InsertCustomerValues;
-  label: string;
-  allowSorting?: boolean;
-}
-
-const columns: CustomerColumn[] = [
-  {
-    key: "customerNumber",
-    label: "Customer #",
-    allowSorting: true,
-  },
-  {
-    key: "name",
-    label: "Name",
-    allowSorting: true,
-  },
-  {
-    key: "email",
-    label: "Email",
-    allowSorting: true,
-  },
-  {
-    key: "phone",
-    label: "Phone Number",
-    allowSorting: true,
-  },
-  {
-    key: "address",
-    label: "Address",
-    allowSorting: true,
-  },
-];
+import { CUSTOMER_COLUMNS } from "./Columns";
+import useCache from "~/hooks/useCache";
 
 interface Sort {
   column: keyof Customer;
@@ -59,12 +24,15 @@ interface Sort {
 
 export default function CustomersTable() {
   const router = useRouter();
-  const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState<Sort>({
-    column: "id",
-    direction: "descending",
-  });
-  const [search, setSearch] = useState("");
+  const [page, setPage] = useCache(1, "customers-page");
+  const [sortBy, setSortBy] = useCache<Sort>(
+    {
+      column: "id",
+      direction: "descending",
+    },
+    "customers-sort",
+  );
+  const [search, setSearch] = useCache("", "customers-search");
   const rowsPerPage = 100;
 
   const { data, isLoading } = api.customer.getAll.useQuery({
@@ -126,7 +94,7 @@ export default function CustomersTable() {
           )
         }
       >
-        <TableHeader columns={columns}>
+        <TableHeader columns={CUSTOMER_COLUMNS}>
           {(column) => (
             <TableColumn key={column.key} allowsSorting={column.allowSorting}>
               {column.label}

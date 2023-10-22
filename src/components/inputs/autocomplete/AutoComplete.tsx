@@ -5,6 +5,7 @@ import { Input } from "@nextui-org/react";
 interface AutocompleteFieldProps {
   isLoading?: boolean;
   inputProps?: React.ComponentProps<typeof Input>;
+  dropdownProps?: Omit<React.ComponentProps<typeof Listbox>, "onAction">;
   suggestions: string[];
   onChange: (value: string) => void;
   selectedValue: string | null;
@@ -15,6 +16,7 @@ interface AutocompleteFieldProps {
 export default function AutocompleteField({
   isLoading,
   inputProps,
+  dropdownProps,
   suggestions,
   onChange,
   renderSuggestion,
@@ -51,6 +53,8 @@ export default function AutocompleteField({
         <Listbox
           ref={ref}
           className={`absolute z-50 mt-1 max-h-48 overflow-auto rounded-xl border-2 bg-[#ffffff] shadow-xl`}
+          color="primary"
+          {...dropdownProps}
           onAction={(key) => {
             onSuggestionSelected(key.toString());
             setIsOpen(false);
