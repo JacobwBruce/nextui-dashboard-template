@@ -21,3 +21,15 @@ export type InsertCustomerValues = z.infer<typeof insertCustomerSchema>;
 export const customerSchema = createSelectSchema(customers);
 
 export type Customer = z.infer<typeof customerSchema>;
+
+export const getCustomersSchema = z.object({
+  limit: z.number().optional(),
+  offset: z.number().optional(),
+  sortBy: z.object({
+    column: customerSchema.keyof(),
+    direction: z.enum(["ascending", "descending"]),
+  }),
+  search: z.string(),
+});
+
+export type GetCustomersInput = z.infer<typeof getCustomersSchema>;

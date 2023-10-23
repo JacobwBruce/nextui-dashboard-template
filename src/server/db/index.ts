@@ -20,3 +20,5 @@ export const db = isPlanetScale
         uri: env.DATABASE_URL,
       }),
     );
+
+export type DrizzleEntity = typeof db;
