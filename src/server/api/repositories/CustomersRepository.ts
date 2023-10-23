@@ -4,7 +4,7 @@ import {
   getCustomersSchema,
 } from "~/schema/customers/CustomerSchemas";
 import { type DrizzleEntity } from "~/server/db";
-import { asc, desc, like, eq } from "drizzle-orm";
+import { asc, desc, like, eq, sql } from "drizzle-orm";
 
 import { customers } from "~/server/db/schema";
 
@@ -15,7 +15,8 @@ export async function createCustomer(
   try {
     await db.insert(customers).values(customer);
   } catch (error) {
-    return error;
+    console.error(error);
+    throw new Error("Failed to create customer");
   }
 }
 
@@ -41,7 +42,8 @@ export async function getCustomers(
       .offset(input.offset ?? 0);
     return result;
   } catch (error) {
-    return error;
+    console.error(error);
+    throw new Error("Failed to get customers");
   }
 }
 
@@ -68,7 +70,8 @@ export async function getCustomersCount(
     const count: number = countResult[0].count;
     return count;
   } catch (error) {
-    return error;
+    console.error(error);
+    throw new Error("Failed to get customers count");
   }
 }
 
@@ -78,7 +81,8 @@ export async function deleteCustomers(db: DrizzleEntity, ids: Set<number>) {
       await db.delete(customers).where(eq(customers.id, id));
     }
   } catch (error) {
-    return error;
+    console.error(error);
+    throw new Error("Failed to delete customers");
   }
 }
 
@@ -90,6 +94,7 @@ export async function getCustomerById(db: DrizzleEntity, id: number) {
       .where(eq(customers.id, id));
     return customer;
   } catch (error) {
-    return error;
+    console.error(error);
+    throw new Error(`Failed to get customer with id ${id}`);
   }
 }

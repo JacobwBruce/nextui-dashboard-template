@@ -1,11 +1,10 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 import {
   getCustomersSchema,
   insertCustomerSchema,
 } from "~/schema/customers/CustomerSchemas";
-import { creditCards, customers } from "~/server/db/schema";
+import { getCustomersCreditCards } from "../repositories/CardsRepository";
 import {
   createCustomer,
   deleteCustomers,
@@ -14,7 +13,6 @@ import {
   getCustomersCount,
 } from "../repositories/CustomersRepository";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { getCustomersCreditCards } from "../repositories/CardsRepository";
 
 export const customerRouter = createTRPCRouter({
   create: publicProcedure
@@ -39,6 +37,7 @@ export const customerRouter = createTRPCRouter({
         getCustomersCount(ctx.db, input),
       ];
       const [customers, count] = await Promise.all(promises);
+
       return {
         count,
         customers,

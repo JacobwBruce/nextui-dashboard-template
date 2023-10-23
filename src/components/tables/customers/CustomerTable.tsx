@@ -16,6 +16,10 @@ import { api } from "~/utils/api";
 import CustomerTableUtils from "./CustomerTableUtils";
 import { CUSTOMER_COLUMNS } from "./Columns";
 import useCache from "~/hooks/useCache";
+import { TRPCClientError } from "@trpc/client";
+import { toast } from "sonner";
+import CustomersLoading from "./CustomersLoading";
+import CustomersTableError from "./CustomersTableError";
 
 interface Sort {
   column: keyof Customer;
@@ -32,28 +36,33 @@ export default function CustomersTable() {
     },
     "customers-sort",
   );
+  const [selectedKeys, setSelectedKeys] = useState(new Set<string>([]));
   const [search, setSearch] = useCache("", "customers-search");
   const rowsPerPage = 100;
 
-  const { data, isLoading } = api.customer.getAll.useQuery({
-    limit: rowsPerPage,
-    offset: (page - 1) * rowsPerPage,
-    sortBy,
-    search,
-  });
+  const { data, isLoading, error, isError } = api.customer.getAll.useQuery(
+    {
+      limit: rowsPerPage,
+      offset: (page - 1) * rowsPerPage,
+      sortBy,
+      search,
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        console.log(error);
+        toast.error("Error loading customers");
+      },
+    },
+  );
 
   useEffect(() => {
     if (search !== "") setPage(1);
-  }, [search]);
+  }, [search, setPage]);
 
-  const [selectedKeys, setSelectedKeys] = useState(new Set<string>([]));
+  if (isLoading) return <CustomersLoading />;
 
-  if (isLoading)
-    return (
-      <div className="flex h-96 w-full items-center justify-center">
-        <Spinner label="Loading..." />
-      </div>
-    );
+  if (isError) return <CustomersTableError message={error.message} />;
 
   return (
     <div className="flex flex-col gap-4">
