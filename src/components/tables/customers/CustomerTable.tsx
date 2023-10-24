@@ -96,7 +96,7 @@ export default function CustomersTable() {
                 showShadow
                 color="primary"
                 page={page}
-                total={Math.ceil(data.count / rowsPerPage)}
+                total={Math.ceil((data.count as number) / rowsPerPage)}
                 onChange={(page: number) => setPage(page)}
               />
             </div>
@@ -111,12 +111,12 @@ export default function CustomersTable() {
           )}
         </TableHeader>
         <TableBody
-          items={data?.customers}
+          items={data?.customers as Customer[]}
           isLoading={isLoading}
           emptyContent={"No customers to display."}
         >
           {(item) => (
-            <TableRow key={item.id}>
+            <TableRow key={item.id} className="cursor-pointer">
               {(columnKey) => (
                 <TableCell>{getKeyValue(item, columnKey)}</TableCell>
               )}
