@@ -1,5 +1,6 @@
-import { Card, CardBody, CardHeader } from "@nextui-org/react";
 import { useRouter } from "next/router";
+import CustomerDetails from "~/components/customer/details/CustomerDetails";
+import CustomerDetailsLoading from "~/components/customer/details/CustomerDetailsLoading";
 import ProtectedRoute from "~/components/routes/ProtectedRoute";
 import { api } from "~/utils/api";
 
@@ -8,18 +9,17 @@ export default function CustomerPage() {
 
   const customerId = parseInt(router.query.id as string);
 
-  const { data: customer } = api.customer.getById.useQuery(customerId, {
-    enabled: !!customerId,
-  });
-
-  console.log(customer);
+  const { data: customer, isLoading } = api.customer.getById.useQuery(
+    customerId,
+    {
+      enabled: !!customerId,
+    },
+  );
 
   return (
     <ProtectedRoute title="Customer">
-      <Card>
-        <CardHeader>Customer</CardHeader>
-        <CardBody>some details</CardBody>
-      </Card>
+      {isLoading && <CustomerDetailsLoading />}
+      {customer && !isLoading && <CustomerDetails customer={customer} />}
     </ProtectedRoute>
   );
 }

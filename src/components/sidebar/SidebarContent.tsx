@@ -28,7 +28,7 @@ export default function SidebarContent() {
                   title={link.title}
                   href={link.path}
                   icon={link.icon}
-                  isActive={router.pathname === link.path}
+                  isActive={router.pathname.includes(link.path)}
                 />
               ))}
             </SidebarMenu>
